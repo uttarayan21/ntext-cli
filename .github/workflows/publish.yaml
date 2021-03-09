@@ -10,35 +10,33 @@ env:
 
 jobs:
     build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
 
-    runs-on: ubuntu-latest
+            - name: Toolchain
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  default: true
+                  override: true
 
-    steps:
-        - name: Checkout
-          uses: actions/checkout@v2
+            - name: Build
+              run: cargo build --release 
 
-        - name: Toolchain
-          uses: actions-rs/toolchain@v1
-          with:
-              toolchain: stable
-              default: true
-              override: true
+            - name: Run tests
+              run: cargo test --verbose
 
-        - name: Build
-          run: cargo build --release 
+            - name: Strip
+              run: strip target/release/ntext-cli
 
-        - name: Run tests
-          run: cargo test --verbose
-
-        - name: Strip
-          run: strip target/release/ntext-cli
-
-        - name: Release
-          uses: softprops/action-gh-release@v1
-          with:
-              files: |
-                  LICENSE
-                  target/release/ntext-cli
-          env:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Release
+              uses: softprops/action-gh-release@v1
+              with:
+                  files: |
+                      LICENSE
+                      target/release/ntext-cli
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
